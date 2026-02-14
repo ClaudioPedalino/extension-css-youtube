@@ -1,62 +1,101 @@
-/* =========================
-   YouTube Hover Pop v1
-   ========================= */
+/* ============================================================
+   YouTube Dracula + Glassmorphism (Restored Pop FX)
+   ============================================================ */
 
-/* Ajustes rápidos */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
 :root {
+    /* Dracula Theme Palette */
+    --dracula-bg: #1a1b26;
+    --dracula-bg-darker: #13141c;
+    --dracula-bg-raised: #24283b;
+    --dracula-fg: #c0caf5;
+    --dracula-comment: #565f89;
+    --dracula-purple: #9d7cd8;
+    --dracula-pink: #bb9af7;
+    --dracula-red: #f7768e;
+    --dracula-cyan: #7dcfff;
+
+    /* RECOVERED ORIGINAL EFFECTS LOGIC */
     --yh-dim: 0.65;
-    /* oscurecimiento general (0..1) */
     --yh-sat: 0.60;
-    /* saturación general */
     --yh-contrast: 0.85;
-    /* contraste general */
     --yh-blur: 0px;
-    /* blur general opcional */
     --yh-hover-scale: 1.06;
-    /* zoom thumbnail al hover */
     --yh-hover-lift: -6px;
-    /* “levanta” */
     --yh-hover-sat: 1.35;
-    /* saturación al hover */
     --yh-hover-contrast: 1.00;
-    /* contraste al hover */
-    --yh-hover-bright: 1.00;
-    /* brillo al hover */
-    --yh-glow: 0 18px 40px rgba(0, 0, 0, 0.55);
-    /* sombra grande */
-    --yh-glow2: 0 0 0 1px rgba(255, 255, 255, 0.06);
-    --yh-ring: 0 0 0 2px rgba(255, 255, 255, 0.12);
+    --yh-hover-bright: 1.05;
+    --yh-glow: 0 18px 40px rgba(0, 0, 0, 0.65), 0 0 15px rgba(157, 124, 216, 0.25);
     --yh-radius: 16px;
     --yh-ease: cubic-bezier(.2, .9, .2, 1);
-    --yh-dur: 240ms;
+    --yh-dur: 280ms;
+
+    /* Transparency & Glass */
+    --glass-bg: rgba(26, 27, 38, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-blur: blur(16px) saturate(180%);
 }
 
-/* Recomendación: respeta reduce-motion */
-@media (prefers-reduced-motion: reduce) {
-    :root {
-        --yh-dur: 0ms;
-        --yh-hover-scale: 1.0;
-        --yh-hover-lift: 0px;
-    }
+/* 0) Base Style & Background */
+html,
+[dark],
+[theme=dark] {
+    --yt-spec-base-background: var(--dracula-bg) !important;
+    --yt-spec-raised-background: var(--dracula-bg-raised) !important;
+    --yt-spec-general-background-a: var(--dracula-bg) !important;
+    --yt-spec-text-primary: var(--dracula-fg) !important;
+    --yt-spec-text-secondary: var(--dracula-comment) !important;
+    --yt-spec-call-to-action: var(--dracula-purple) !important;
 }
 
-/* 1) “Oscurecer todo” de manera controlada:
-   aplicamos filtros a thumbnails + textos (no a todo el body para no romper UI/overlays) */
+body {
+    background-color: var(--dracula-bg) !important;
+    background-image:
+        radial-gradient(at 0% 0%, rgba(157, 124, 216, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(125, 207, 255, 0.08) 0px, transparent 50%);
+    background-attachment: fixed;
+    font-family: 'Outfit', sans-serif !important;
+}
 
+/* Texture Overlay */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3%3Ffilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Glassmorphism for UI Shell */
+ytd-masthead#masthead {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    box-shadow: none !important;
+}
+
+#guide-content.ytd-app,
+ytd-guide-renderer.ytd-app {
+    background: var(--glass-bg) !important;
+    backdrop-filter: var(--glass-blur) !important;
+}
+
+/* 1) Restore Hover Dimming Logic */
 ytd-rich-item-renderer,
 ytd-video-renderer,
 ytd-grid-video-renderer,
 ytd-compact-video-renderer,
 ytd-playlist-renderer,
 ytd-reel-item-renderer {
-    transition: filter var(--yh-dur) var(--yh-ease),
-        opacity var(--yh-dur) var(--yh-ease);
-    filter:
-        brightness(var(--yh-dim)) saturate(var(--yh-sat)) contrast(var(--yh-contrast)) blur(var(--yh-blur));
+    transition: filter var(--yh-dur) var(--yh-ease), opacity var(--yh-dur) var(--yh-ease), transform var(--yh-dur) var(--yh-ease);
+    filter: brightness(var(--yh-dim)) saturate(var(--yh-sat)) contrast(var(--yh-contrast)) blur(var(--yh-blur));
     opacity: 0.92;
 }
 
-/* 2) El thumbnail: hacemos que tenga animación linda y “skin” acrílico/Netflix */
+/* 2) Restore Acrylic Thumbnail Overlay */
 ytd-rich-item-renderer #thumbnail,
 ytd-video-renderer #thumbnail,
 ytd-grid-video-renderer #thumbnail,
@@ -65,50 +104,9 @@ ytd-playlist-renderer #thumbnail,
 ytd-reel-item-renderer #thumbnail {
     border-radius: var(--yh-radius) !important;
     overflow: hidden !important;
-    transform: translateZ(0);
-    transition: transform var(--yh-dur) var(--yh-ease),
-        box-shadow var(--yh-dur) var(--yh-ease),
-        filter var(--yh-dur) var(--yh-ease);
-    box-shadow: var(--yh-glow2);
+    transition: transform var(--yh-dur) var(--yh-ease), box-shadow var(--yh-dur) var(--yh-ease), filter var(--yh-dur) var(--yh-ease);
 }
 
-/* 3) Hover / Focus: el card vuelve a la vida */
-ytd-rich-item-renderer:hover,
-ytd-video-renderer:hover,
-ytd-grid-video-renderer:hover,
-ytd-compact-video-renderer:hover,
-ytd-playlist-renderer:hover,
-ytd-reel-item-renderer:hover,
-ytd-rich-item-renderer:focus-within,
-ytd-video-renderer:focus-within,
-ytd-grid-video-renderer:focus-within,
-ytd-compact-video-renderer:focus-within,
-ytd-playlist-renderer:focus-within,
-ytd-reel-item-renderer:focus-within {
-    filter: none;
-    opacity: 1;
-}
-
-/* 4) Hover del thumbnail: zoom + lift + glow + color boost */
-ytd-rich-item-renderer:hover #thumbnail,
-ytd-video-renderer:hover #thumbnail,
-ytd-grid-video-renderer:hover #thumbnail,
-ytd-compact-video-renderer:hover #thumbnail,
-ytd-playlist-renderer:hover #thumbnail,
-ytd-reel-item-renderer:hover #thumbnail,
-ytd-rich-item-renderer:focus-within #thumbnail,
-ytd-video-renderer:focus-within #thumbnail,
-ytd-grid-video-renderer:focus-within #thumbnail,
-ytd-compact-video-renderer:focus-within #thumbnail,
-ytd-playlist-renderer:focus-within #thumbnail,
-ytd-reel-item-renderer:focus-within #thumbnail {
-    transform: translateY(var(--yh-hover-lift)) scale(var(--yh-hover-scale));
-    box-shadow: var(--yh-glow), var(--yh-ring);
-    filter:
-        saturate(var(--yh-hover-sat)) contrast(var(--yh-hover-contrast)) brightness(var(--yh-hover-bright));
-}
-
-/* 5) Un toque “acrílico”: leve overlay en el thumbnail al NO-hover */
 ytd-rich-item-renderer #thumbnail::after,
 ytd-video-renderer #thumbnail::after,
 ytd-grid-video-renderer #thumbnail::after,
@@ -126,7 +124,41 @@ ytd-reel-item-renderer #thumbnail::after {
     transition: opacity var(--yh-dur) var(--yh-ease);
 }
 
-/* Al hover, se va el overlay para que exploten colores */
+/* 3) Global Hover State (Revive) */
+ytd-rich-item-renderer:hover,
+ytd-video-renderer:hover,
+ytd-grid-video-renderer:hover,
+ytd-compact-video-renderer:hover,
+ytd-playlist-renderer:hover,
+ytd-reel-item-renderer:hover,
+ytd-rich-item-renderer:focus-within,
+ytd-video-renderer:focus-within,
+ytd-grid-video-renderer:focus-within,
+ytd-compact-video-renderer:focus-within,
+ytd-playlist-renderer:focus-within,
+ytd-reel-item-renderer:focus-within {
+    filter: none;
+    opacity: 1;
+}
+
+/* 4) Restore Thumbnail Zoom + Lift + Glow */
+ytd-rich-item-renderer:hover #thumbnail,
+ytd-video-renderer:hover #thumbnail,
+ytd-grid-video-renderer:hover #thumbnail,
+ytd-compact-video-renderer:hover #thumbnail,
+ytd-playlist-renderer:hover #thumbnail,
+ytd-reel-item-renderer:hover #thumbnail,
+ytd-rich-item-renderer:focus-within #thumbnail,
+ytd-video-renderer:focus-within #thumbnail,
+ytd-grid-video-renderer:focus-within #thumbnail,
+ytd-compact-video-renderer:focus-within #thumbnail,
+ytd-playlist-renderer:focus-within #thumbnail,
+ytd-reel-item-renderer:focus-within #thumbnail {
+    transform: translateY(var(--yh-hover-lift)) scale(var(--yh-hover-scale));
+    box-shadow: var(--yh-glow);
+    filter: saturate(var(--yh-hover-sat)) contrast(var(--yh-hover-contrast)) brightness(var(--yh-hover-bright));
+}
+
 ytd-rich-item-renderer:hover #thumbnail::after,
 ytd-video-renderer:hover #thumbnail::after,
 ytd-grid-video-renderer:hover #thumbnail::after,
@@ -142,28 +174,52 @@ ytd-reel-item-renderer:focus-within #thumbnail::after {
     opacity: 0.0;
 }
 
-/* 6) Texto (títulos/canales) un poco más apagado sin hover */
+/* 5) Text Pop FX */
 ytd-rich-item-renderer #video-title,
 ytd-video-renderer #video-title,
 ytd-grid-video-renderer #video-title,
 ytd-compact-video-renderer #video-title {
-    transition: opacity var(--yh-dur) var(--yh-ease), filter var(--yh-dur) var(--yh-ease);
+    transition: opacity var(--yh-dur) var(--yh-ease), filter var(--yh-dur) var(--yh-ease), color 0.2s ease;
     opacity: 0.90;
     filter: saturate(0.8);
+    color: var(--dracula-fg) !important;
 }
 
-/* Texto “revive” al hover */
 ytd-rich-item-renderer:hover #video-title,
 ytd-video-renderer:hover #video-title,
 ytd-grid-video-renderer:hover #video-title,
-ytd-compact-video-renderer:hover #video-title,
-ytd-rich-item-renderer:focus-within #video-title,
-ytd-video-renderer:focus-within #video-title,
-ytd-grid-video-renderer:focus-within #video-title,
-ytd-compact-video-renderer:focus-within #video-title {
+ytd-compact-video-renderer:hover #video-title {
     opacity: 1;
     filter: none;
+    color: var(--dracula-purple) !important;
 }
 
-/* 7) Evita que cosas importantes (player, overlays) queden raras:
-   no tocamos ytd-player ni overlays globales */
+/* Additional Polish */
+.ytp-play-progress {
+    background: var(--dracula-purple) !important;
+    box-shadow: 0 0 10px rgba(157, 124, 216, 0.5) !important;
+}
+
+.ytp-scrubber-button {
+    background: var(--dracula-pink) !important;
+}
+
+#subscribe-button yt-button-shape button {
+    background: var(--dracula-purple) !important;
+    color: white !important;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dracula-bg) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #33467c !important;
+    border-radius: 10px !important;
+    border: 2px solid var(--dracula-bg) !important;
+}
